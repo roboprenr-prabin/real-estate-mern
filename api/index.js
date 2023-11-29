@@ -2,6 +2,7 @@ import express from "express";
 import mongoose from "mongoose";
 import dotenv from 'dotenv';
 import userRouter from './routes/user.route.js';
+import authRouter from './routes/auth.route.js';
 dotenv.config();
 
 mongoose.connect(process.env.MONGO).then(()=>{
@@ -10,15 +11,12 @@ mongoose.connect(process.env.MONGO).then(()=>{
 .catch((err)=>{
     console.log(err)
 })
-const app = express()
+const app = express();
+app.use(express.json());     //this will allow json as a input for the server
 
 app.listen(3000,()=>{
     console.log('server is running on port 3000!!');
 })
 
-// app.get('/',(req,res)=>{
-//     res.json({
-//         message: "Hello world"
-//     })
-// });
 app.use("/api/user",userRouter);
+app.use("/api/auth",authRouter);
