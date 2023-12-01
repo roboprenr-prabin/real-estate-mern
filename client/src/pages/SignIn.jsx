@@ -7,7 +7,7 @@ export default function SignIn() {
   const [formData,setFormData] = useState({});
   // const [error,setError] = useState(null);
   // const [loading,setLoaing] = useState(false);
-  const {loading,error} = useSelector((state)=>state.user);
+  const { loading, error} = useSelector((state) => state.user);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const handleChange = (e) =>{
@@ -37,9 +37,9 @@ export default function SignIn() {
     }
     // setLoaing(false);
     // setError(null);
-    dispatch(signInSuccess(data.message))
+    dispatch(signInSuccess(data));
     // console.log(data);
-    navigate('/');
+    // navigate('/');
   }
   // console.log(formData);
   return (
