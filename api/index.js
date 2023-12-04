@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import dotenv from 'dotenv';
 import userRouter from './routes/user.route.js';
 import authRouter from './routes/auth.route.js';
+import cookieParser from "cookie-parser";
 dotenv.config();
 
 mongoose.connect(process.env.MONGO).then(()=>{
@@ -13,6 +14,7 @@ mongoose.connect(process.env.MONGO).then(()=>{
 })
 const app = express();
 app.use(express.json());     //this will allow json as a input for the server
+app.use(cookieParser());     //To use cockie in the backend
 
 app.listen(3000,()=>{
     console.log('server is running on port 3000!!');
@@ -20,7 +22,6 @@ app.listen(3000,()=>{
 
 app.use("/api/user",userRouter);
 app.use("/api/auth",authRouter);
-
 
 
 
