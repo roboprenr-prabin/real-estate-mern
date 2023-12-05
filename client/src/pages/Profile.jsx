@@ -3,8 +3,9 @@ import {useSelector } from 'react-redux'
 import { useRef } from 'react'
 import {getDownloadURL, getStorage,ref, uploadBytesResumable} from 'firebase/storage'
 import { app } from '../firebase'
-import { updateUserFailure,updateUserStart,updateUserSuccess } from '../redux/user/userSlice'
+import { deleteUserFailure, deleteUserStart, deleteUserSuccess, updateUserFailure,updateUserStart,updateUserSuccess } from '../redux/user/userSlice'
 import { useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 
 export default function Profile() {
   const fileRef = useRef(null)
@@ -17,6 +18,7 @@ export default function Profile() {
   const [updateSucess,setUpdateSucess] = useState(false);
   // console.log(formData)
   const dispatch = useDispatch()
+  const navigate = useNavigate();
 
   useEffect(()=>{
     if(file){
@@ -43,9 +45,10 @@ export default function Profile() {
       ()=>{
         getDownloadURL(uploadTask.snapshot.ref).then(
           (downloadURL)=>setFormData({...formData,avatar:downloadURL})
-        )
-      }
-    )
+          )
+          SetFileUploadErr(false)
+        }
+      )
     // handleSubmit;
   }
 
@@ -74,10 +77,31 @@ export default function Profile() {
         return;
       } 
       setUpdateSucess(true)
+      
       dispatch(updateUserSuccess(data))
     } catch (error) {
       dispatch(updateUserFailure(error.message));
     }
+  }
+
+  const handleDeleteUser = async() =>{
+    try {
+      dispatch(deleteUserStart())
+      const res = await fetch(`/api/user/delete/${currentUser._id}`,{
+        method:"DELETE"
+      })
+      const data = await res.json();
+      if(data.success === false){
+        dispatch(deleteUserFailure(data.message));
+        return;
+      }
+      dispatch(deleteUserSuccess(data));
+
+      navigate("/sign-in");
+    } catch (error) {
+      dispatch(deleteUserFailure(error.message))
+    }
+
   }
 
   return (
@@ -107,11 +131,11 @@ export default function Profile() {
       </form>
 
       <div className='flex justify-between mt-5'>
-        <span className='text-red-700 cursor-pointer'>Delete Account</span>
+        <span onClick={handleDeleteUser} className='text-red-700 cursor-pointer'>Delete Account</span>
         <span className='text-red-700 cursor-pointer'>Sign Out</span>
       </div>
-      <p className='text-red-700 text-center mt-5'>{error}</p>
-      {updateSucess? <p className='text-green-700 text-center mt-5'>Successfully Updated</p>:""}
+      <p className='text-red-700 mt-5'>{error}</p>
+      {updateSucess? <p className='text-green-700 mt-5'>Successfully Updated</p>:""}
     </div>
   )
 }
